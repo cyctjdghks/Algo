@@ -1,20 +1,25 @@
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
 
 public class Main {
     static int N;
     static long B;
     static int[][] matrix;
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        N = sc.nextInt();
-        B = sc.nextLong();
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        N = Integer.parseInt(st.nextToken());
+        B = Long.parseLong(st.nextToken());
         matrix = new int[N][N];
 
         // read the matrix
         for (int i = 0; i < N; i++) {
+            st = new StringTokenizer(br.readLine());
             for (int j = 0; j < N; j++) {
-                matrix[i][j] = sc.nextInt();
+                matrix[i][j] = Integer.parseInt(st.nextToken());
             }
         }
 
@@ -22,12 +27,14 @@ public class Main {
         int[][] result = pow(matrix, B);
 
         // print the result
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                System.out.print(result[i][j] % 1000 + " ");
+                sb.append(result[i][j] % 1000).append(' ');
             }
-            System.out.println();
+            sb.append('\n');
         }
+        System.out.print(sb.toString());
     }
 
     // matrix exponentiation function
@@ -53,8 +60,8 @@ public class Main {
             for (int j = 0; j < N; j++) {
                 for (int k = 0; k < N; k++) {
                     C[i][j] += A[i][k] * B[k][j];
+                    C[i][j] %= 1000;
                 }
-                C[i][j] %= 1000;
             }
         }
         return C;
