@@ -1,192 +1,173 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Scanner;
+import java.util.*;
 
-// 8. BOJ 15683 감시
-// 시간초과 수정
 public class Main {
+    // 0은 빈 칸, 6은 벽, 1~5는 CCTV를 나타내고, 문제에서 설명한 CCTV의 종류이다.
+    static int N, M;
+    static int[][] map;
+    static ArrayList<CCTV> list;
+    static int res;
 
-	static int N;
-	static int M;
-	static int[][] map;
-	static int min;
-	static ArrayList<CCTV> list = new ArrayList<>();
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
 
-	static class CCTV {
-		int x, y;
-		int type;
+        N = sc.nextInt();
+        M = sc.nextInt();
+        res = N * M;
+        map = new int[N][M];
+        list = new ArrayList<>();
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                map[i][j] = sc.nextInt();
 
-		public CCTV(int x, int y, int type) {
-			this.x = x;
-			this.y = y;
-			this.type = type;
-		}
-	}
+                if (1 <= map[i][j] && map[i][j] <= 5) {
+                    list.add(new CCTV(i, j, map[i][j]));
+                }
+            }
+        }
 
-	public static void main(String[] args) {
-		// 0은 빈칸
-		// 6은 벽
-		// 1 ~ 5 는 cctv
-		// cctv로 탐색이 가능하면 -1
-		// 1번 - 우측, 2번 - 아래, 3번 - 좌측, 4번 - 위
+        search(0, map);
 
-		Scanner sc = new Scanner(System.in);
+        System.out.println(res);
+    }
 
-		N = sc.nextInt();
-		M = sc.nextInt();
-		map = new int[N][M];
-		for (int i = 0; i < N; i++) {
-			for (int j = 0; j < M; j++) {
-				map[i][j] = sc.nextInt();
-				if (1 <= map[i][j] && map[i][j] <= 5) {
-					list.add(new CCTV(i, j, map[i][j]));
-				}
-			}
-		}
-		min = N * M;
-		search(0, map);
+    private static void search(int index, int[][] nMap) {
+        if (index == list.size()) {
+            int cnt = 0;
 
-		System.out.println(min);
-	}
+            for (int i = 0; i < N; i++) {
+                for (int j = 0; j < M; j++) {
+                    if (nMap[i][j] == 0) cnt++;
+                }
+            }
 
-	static void search(int idx, int[][] nMap) {
-		//		종료
-		if(idx == list.size()) {
-			int cnt = 0;
-			//			사작지대 갯수 세기
-			for(int i = 0 ; i < N; i++) {
-				for(int j = 0; j < M ;j++) {
-					if(nMap[i][j] == 0) {
-						cnt++;
-					}
-				}
-			}
-			min = Math.min(min, cnt);
-			return;
-		}
-		//		재귀호출
-		//		리스트에서 CCTV 뽑아서 감시 솔루션
-		CCTV cctv = list.get(idx);
-		int x = cctv.x;
-		int y = cctv.y;
-		int[][] vMap = new int[N][M];
-		switch(cctv.type) {
-		case 1 : //  1번 감시 카메라
-			for(int d = 1; d <= 4 ; d++) {
-				//				감시
-				for(int i = 0; i < N; i++) {
-					vMap[i] = Arrays.copyOf(nMap[i],M);
-				}
-				Init(x, y,vMap, d);
-				//				다음번째  CCTV 호출
-				search(idx + 1, vMap);
-				//				백트래킹 (X)
-			}
-			break;
-		case 2 : //  2번 감시 카메라
-			for(int d = 1; d <= 2 ; d++) {
-				//				감시
-				for(int i = 0; i < N; i++) {
-					vMap[i] = Arrays.copyOf(nMap[i],M);
-				}
-				Init(x, y,vMap, d);
-				Init(x, y,vMap, d+2);
-				//				다음번째  CCTV 호출
-				search(idx + 1, vMap);
-				//				백트래킹 (X)
-			}
-			break;	
-		case 3 : //  3번 감시 카메라
-			for(int d = 1; d <= 4 ; d++) {
-				//				감시
-				for(int i = 0; i < N; i++) {
-					vMap[i] = Arrays.copyOf(nMap[i],M);
-				}
-				Init(x, y,vMap, d);
-				Init(x, y,vMap, d-1 <= 0 ? d-1 + 4 : d-1);
-				//				다음번째  CCTV 호출
-				search(idx + 1, vMap);
-				//				백트래킹 (X)
-			}
-			break;	
-		case 4 : //  4번 감시 카메라
-			for(int d = 1; d <= 4 ; d++) {
-				//				감시
-				for(int i = 0; i < N; i++) {
-					vMap[i] = Arrays.copyOf(nMap[i],M);
-				}
-				Init(x, y,vMap, d);
-				Init(x, y,vMap, d-1 <= 0 ? d-1 + 4 : d-1);
-				Init(x, y,vMap, d-2 <= 0 ? d-2 + 4 : d-2);
-				//				다음번째  CCTV 호출
-				search(idx + 1, vMap);
-				//				백트래킹 (X)
-			}
-			break;	
-		case 5 : //  5번 감시 카메라
-			//				감시
-			for(int i = 0; i < N; i++) {
-				vMap[i] = Arrays.copyOf(nMap[i],M);
-			}
-			Init(x, y,vMap, 1);
-			Init(x, y,vMap, 2);
-			Init(x, y,vMap, 3);
-			Init(x, y,vMap, 4);			
-			//				다음번째  CCTV 호출
-			search(idx + 1, vMap);
-			//				백트래킹 (X)
-			break;			
-		}
+            res = Math.min(res, cnt);
 
-	}
+            return;
+        }
 
-	// 설정한 위치로 cctv가 탐색 - 탐색된 구역은 음수
-	public static void Init(int r, int c, int[][] cMap, int num) {
-		// 1번 - 우측, 2번 - 아래, 3번 - 좌측, 4번 - 위
-		switch (num) {
-		case 1:
-			for (int k = c; k < M; k++) {
-				if (cMap[r][k] == 6) {
-					break;
-				}
-				if (cMap[r][k] <= 0) {
-					cMap[r][k] = -1;
-				}
-			}
-			break;
-		case 2:
-			for (int k = r; k < N; k++) {
-				if (cMap[k][c] == 6) {
-					break;
-				}
-				if (cMap[k][c] <= 0) {
-					cMap[k][c] = -1;
-				}
-			}
-			break;
-		case 3:
-			for (int k = c; k >= 0; k--) {
-				if (cMap[r][k] == 6) {
-					break;
-				}
-				if (cMap[r][k] <= 0) {
-					cMap[r][k] = -1;
-				}
-			}
-			break;
-		case 4:
-			for (int k = r; k >= 0; k--) {
-				if (cMap[k][c] == 6) {
-					break;
-				}
-				if (cMap[k][c] <= 0) {
-					cMap[k][c] = -1;
-				}
-			}
-			break;
-		default:
-			break;
-		}
-	}
+        CCTV cctv = list.get(index);
+        int x = cctv.x;
+        int y = cctv.y;
+        int type = cctv.type;
+        int[][] vMap = new int[N][M];
 
+        switch (type) {
+            case 1:
+                for (int d = 1; d <= 4; d++) {
+                    for (int i = 0; i < N; i++) {
+                        vMap[i] = Arrays.copyOf(nMap[i], M);
+                    }
+
+                    Init(x, y, vMap, d);
+                    search(index + 1, vMap);
+                }
+                break;
+            case 2:
+                for (int d = 1; d <= 2; d++) {
+                    for (int i = 0; i < N; i++) {
+                        vMap[i] = Arrays.copyOf(nMap[i], M);
+                    }
+
+                    Init(x, y, vMap, d);
+                    Init(x, y, vMap, d + 2);
+                    search(index + 1, vMap);
+                }
+                break;
+            case 3:
+                for (int d = 1; d <= 4; d++) {
+                    for (int i = 0; i < N; i++) {
+                        vMap[i] = Arrays.copyOf(nMap[i], M);
+                    }
+
+                    Init(x, y, vMap, d);
+                    Init(x, y, vMap, d - 1 <= 0 ? d - 1 + 4 : d - 1);
+                    search(index + 1, vMap);
+                }
+                break;
+            case 4:
+                for (int d = 1; d <= 4; d++) {
+                    for (int i = 0; i < N; i++) {
+                        vMap[i] = Arrays.copyOf(nMap[i], M);
+                    }
+
+                    Init(x, y, vMap, d);
+                    Init(x, y, vMap, d - 1 <= 0 ? d - 1 + 4 : d - 1);
+                    Init(x, y, vMap, d - 2 <= 0 ? d - 2 + 4 : d - 2);
+                    search(index + 1, vMap);
+                }
+                break;
+            case 5:
+                for (int i = 0; i < N; i++) {
+                    vMap[i] = Arrays.copyOf(nMap[i], M);
+                }
+
+                Init(x, y, vMap, 1);
+                Init(x, y, vMap, 2);
+                Init(x, y, vMap, 3);
+                Init(x, y, vMap, 4);
+                search(index + 1, vMap);
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    private static void Init(int x, int y, int[][] cMap, int d) {
+        switch (d) {
+            case 1:
+                for (int k = y; k < M; k++) {
+                    if (cMap[x][k] == 6) {
+                        break;
+                    }
+                    if (cMap[x][k] <= 0) {
+                        cMap[x][k] = -1;
+                    }
+                }
+                break;
+            case 2:
+                for (int k = x; k < N; k++) {
+                    if (cMap[k][y] == 6) {
+                        break;
+                    }
+                    if (cMap[k][y] <= 0) {
+                        cMap[k][y] = -1;
+                    }
+                }
+                break;
+            case 3:
+                for (int k = y; k >= 0; k--) {
+                    if (cMap[x][k] == 6) {
+                        break;
+                    }
+                    if (cMap[x][k] <= 0) {
+                        cMap[x][k] = -1;
+                    }
+                }
+                break;
+            case 4:
+                for (int k = x; k >= 0; k--) {
+                    if (cMap[k][y] == 6) {
+                        break;
+                    }
+                    if (cMap[k][y] <= 0) {
+                        cMap[k][y] = -1;
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    static class CCTV {
+        int x, y;
+        int type;
+
+        public CCTV(int x, int y, int type) {
+            this.x = x;
+            this.y = y;
+            this.type = type;
+        }
+    }
 }
