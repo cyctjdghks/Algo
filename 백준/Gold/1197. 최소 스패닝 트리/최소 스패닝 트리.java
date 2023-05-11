@@ -1,11 +1,11 @@
 import java.util.ArrayList;
-import java.util.PriorityQueue;
+import java.util.Collections;
 import java.util.Scanner;
 
 public class Main {
     static int V, E;
-    static boolean[] v;
-    static ArrayList<Node>[] list;
+    static int[] parents;
+    static ArrayList<Node> list;
     static int res;
 
     public static void main(String[] args) {
@@ -26,51 +26,66 @@ public class Main {
 
         V = sc.nextInt();
         E = sc.nextInt();
-        v = new boolean[V + 1];
-        list = new ArrayList[V + 1];
+        parents = new int[V + 1];
+        list = new ArrayList<>();
         res = 0;
-        for (int i = 1; i <= V; i++) {
-            list[i] = new ArrayList<>();
-        }
 
         for (int i = 0; i < E; i++) {
             int x = sc.nextInt();
             int y = sc.nextInt();
             int w = sc.nextInt();
 
-            list[x].add(new Node(y, w));
-            list[y].add(new Node(x, w));
+            list.add(new Node(x, y, w));
         }
 
-        PriorityQueue<Node> pq = new PriorityQueue<>();
-        // 임의의 한 점에서 시작
-        pq.add(new Node(1, 0));
+        Collections.sort(list);
 
-        while (!pq.isEmpty()) {
-            Node node = pq.poll();
-            int to = node.to;
-            int weight = node.weight;
+        init();
 
-            if (v[to]) continue;
+        int cnt = 0;
 
-            v[to] = true;
-            res += weight;
+        for (Node node : list) {
+            if (union(node.from, node.to)) {
+                res += node.weight;
+                cnt++;
 
-            for (Node next : list[to]) {
-                if (!v[next.to]) {
-                    pq.add(next);
-                }
+                if(cnt == E - 1) break;
             }
         }
 
         System.out.println(res);
     }
 
+    private static boolean union(int from, int to) {
+        int fromRoot = find(from);
+        int toRoot = find(to);
+
+        if (fromRoot == toRoot) return false;
+        else parents[toRoot] = fromRoot;
+        return true;
+    }
+
+    private static int find(int x) {
+        if (parents[x] == x) {
+            return x;
+        } else {
+            return parents[x] = find(parents[x]);
+        }
+    }
+
+    private static void init() {
+        for (int i = 1; i <= V; i++) {
+            parents[i] = i;
+        }
+    }
+
     public static class Node implements Comparable<Node> {
+        int from;
         int to;
         int weight;
 
-        public Node(int to, int weight) {
+        public Node(int from, int to, int weight) {
+            this.from = from;
             this.to = to;
             this.weight = weight;
         }
