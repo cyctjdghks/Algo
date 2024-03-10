@@ -52,7 +52,9 @@ class Solution {
             if(!visit[i] && tickets[i][0].equals(last)) {
                 visit[i] = true;
                 list.add(tickets[i][1]);
+                
                 dfs(count + 1, tickets, list);
+                
                 if(isFound) return; // 정답을 찾았으면 추가 탐색 중지
                 visit[i] = false; // 방문 취소 (백트래킹)
                 list.remove(list.size() - 1);
