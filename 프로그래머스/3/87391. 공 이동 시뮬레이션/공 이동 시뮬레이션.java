@@ -1,28 +1,28 @@
 class Solution {
     public long solution(int n, int m, int x, int y, int[][] queries) {
-        long left = y;
-        long right = y;
         long top = x;
         long bottom = x;
+        long left = y;
+        long right = y;
 
         for (int i = queries.length - 1; i >= 0; i--) {
             int direction = queries[i][0];
             int dist = queries[i][1];
 
             if (direction == 0) { // LEFT
-                if (left != 0) 
+                if (left > 0) 
                     left += dist;
                 right = Math.min(m - 1, right + dist);
             } else if (direction == 1) { // RIGHT
-                if (right != m - 1) 
+                if (right < m - 1) 
                     right -= dist;
                 left = Math.max(0, left - dist);
             } else if (direction == 2) { // UP
-                if (top != 0) 
+                if (top > 0) 
                     top += dist;
                 bottom = Math.min(n - 1, bottom + dist);
             } else if (direction == 3) { // DOWN
-                if (bottom != n - 1) 
+                if (bottom < n - 1) 
                     bottom -= dist;
                 top = Math.max(0, top - dist);
             }
