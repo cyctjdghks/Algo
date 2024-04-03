@@ -1,39 +1,42 @@
 class Solution {
     public long solution(int n, int m, int x, int y, int[][] queries) {
-        long top = x;
-        long bottom = x;
-        long left = y;
-        long right = y;
-
-        for (int i = queries.length - 1; i >= 0; i--) {
-            int direction = queries[i][0];
-            int dist = queries[i][1];
-
-            if (direction == 0) { // LEFT
-                if (left > 0) 
-                    left += dist;
-                right = Math.min(m - 1, right + dist);
-            } else if (direction == 1) { // RIGHT
-                if (right < m - 1) 
-                    right -= dist;
-                left = Math.max(0, left - dist);
-            } else if (direction == 2) { // UP
-                if (top > 0) 
-                    top += dist;
-                bottom = Math.min(n - 1, bottom + dist);
-            } else if (direction == 3) { // DOWN
-                if (bottom < n - 1) 
-                    bottom -= dist;
-                top = Math.max(0, top - dist);
+        long answer = 0;
+        
+        long x1 = x;
+        long x2 = x;
+        long y1 = y;
+        long y2 = y;
+        
+        for(int i = queries.length - 1; i >= 0 ; i--) {
+            int dir = queries[i][0];
+            int cost = queries[i][1];
+            
+            if (dir == 0) {
+                if (y1 > 0) 
+                    y1 += cost;
+                y2 = Math.min(m - 1, y2 + cost);
+            } else if (dir == 1) {
+                if (y2 < m - 1) 
+                    y2 -= cost;
+                y1 = Math.max(0, y1 - cost);
+            } else if (dir == 2) {
+                if (x1 > 0) 
+                    x1 += cost;
+                x2 = Math.min(n - 1, x2 + cost);
+            } else if (dir == 3) {
+                if (x2 < n - 1) 
+                    x2 -= cost;
+                x1 = Math.max(0, x1 - cost);
             }
-
-            // 범위가 격자를 벗어나면 더 이상 유효한 시작점이 없음
-            if (left >= m || right < 0 || top >= n || bottom < 0) {
+            
+            if(x1 >= n || x2 < 0  || y1 >= m || y2 < 0) {
                 return 0;
             }
+            
         }
-
-        // 최종적으로 가능한 시작점의 범위가 격자 내에 있다면 개수를 반환
-        return (right - left + 1) * (bottom - top + 1);
+        
+        answer = (x2 - x1 + 1) * (y2 - y1 + 1);
+        
+        return answer;
     }
 }
