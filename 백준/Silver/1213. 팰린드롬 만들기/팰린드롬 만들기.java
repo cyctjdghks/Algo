@@ -2,8 +2,10 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner scan = new Scanner(System.in);
-        String input = scan.next();
+        
+        Scanner sc = new Scanner(System.in);
+        
+        String input = sc.next();
         int size = input.length();
 
         int[] alp = new int[26];
